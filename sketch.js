@@ -48,7 +48,8 @@ function setup() {
   robber.addAnimation("collided", robber_collided);
   robber.scale = 0.5;
   
-  coins = createSprite(600,200,20,20)
+  //coins = createSprite(600,200,20,20);
+
   ground = createSprite(200,180,400,20);
   ground.addImage("ground",groundImage);
   ground.x = ground.width /2;
@@ -69,11 +70,11 @@ function setup() {
   invisibleGround = createSprite(200,190,400,10);
   invisibleGround.visible = false;
   
-  coinsGroup = new Group();
+  //coinsGroup = new Group();
   obstaclesGroup = new Group();
   
-  score = 0;
-  coin = 0;
+  robber.debug = true;
+ 
 }
 
 function draw() {
@@ -90,12 +91,14 @@ function draw() {
       robber.velocityY = -14;
     }
 
-    if(coins.isTouching(robber)){
+spawnCoins();
+
+    if (coins.collide(robber)){
       console.log("collision")
         coins.destroy();
         coin = coin + 1;
   
-      }
+    }
 
     robber.velocityY = robber.velocityY + 0.8
   
@@ -104,7 +107,7 @@ function draw() {
     }
   
     robber.collide(invisibleGround);
-    spawnCoins();
+    //spawnCoins();
     spawnObstacles();
     
     if (score>0 && score%100 === 0){
@@ -120,7 +123,7 @@ function draw() {
         
     }
   }
-  else if (gameState === END) {
+  else if(gameState === END) {
     gameOver.visible = true;
     restart.visible = true;
     
@@ -128,21 +131,20 @@ function draw() {
     ground.velocityX = 0;
     robber.velocityY = 0;
     obstaclesGroup.setVelocityXEach(0);
-    coinsGroup.setVelocityXEach(0);
+    coins.setVelocityX(0);
     
     //change the trex animation
     robber.changeAnimation("collided",robber_collided);
     
     //set lifetime of the game objects so that they are never destroyed
     obstaclesGroup.setLifetimeEach(-1);
-    coinsGroup.setLifetimeEach(-1);
+    coins.setLifetime(-1);
     
+
     if(mousePressedOver(restart)) {
       reset();
     }
   }
-  
-  
   drawSprites();
 }
 
@@ -163,9 +165,9 @@ function spawnCoins() {
     robber.depth = robber.depth + 1;
     
     //add each coin to the group
-    coinsGroup.add(coins);
-
+    //coinsGroup.add(coins);
   
+}
 }
 
 function spawnObstacles() {
@@ -213,3 +215,4 @@ function reset(){
   score = 0;
   
 }
+
