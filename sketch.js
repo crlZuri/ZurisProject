@@ -7,10 +7,10 @@ var gameState = PLAY;
 var robber, robber_running, robber_collided;
 var ground, invisibleGround, groundImage;
 
-var coinsGroup, coins, coinsImg
+var coinsGroup, coin, coinImg
 var obstaclesGroup, obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obstacle6;
 
-var coin=0;
+var coinCount=0;
 
 var score=0;
 
@@ -23,7 +23,7 @@ function preload(){
   
   groundImage = loadImage("ground2.png");
   
-  coinsImg = loadImage("coin.jpg");
+  coinImg = loadImage("coin.jpg");
 
   obstacle1 = loadImage("obstacle1.png");
   obstacle2 = loadImage("obstacle2.png");
@@ -48,7 +48,7 @@ function setup() {
   robber.addAnimation("collided", robber_collided);
   robber.scale = 0.5;
   
-  //coins = createSprite(600,200,20,20);
+  //coin = createSprite(600,200,20,20);
 
   ground = createSprite(200,180,400,20);
   ground.addImage("ground",groundImage);
@@ -70,17 +70,17 @@ function setup() {
   invisibleGround = createSprite(200,190,400,10);
   invisibleGround.visible = false;
   
-  //coinsGroup = new Group();
+  coinsGroup = [];
   obstaclesGroup = new Group();
   
-  robber.debug = true;
+  //robber.debug = true;
  
 }
 
 function draw() {
   background(255);
   text("Score: "+ score, 500,50);
-  text("Coins: "+ coin, 500,40)
+  text("Coins: "+ coinCount, 500,40)
   
   if (gameState===PLAY){
     score = score + Math.round(getFrameRate()/60);
@@ -90,16 +90,17 @@ function draw() {
       jumpSound.play();
       robber.velocityY = -14;
     }
+    spawnCoins();
+    
+    
+    if (coinsGroup.pop().isTouching()) {
+   // coinsGroup.destroyEach();
+      coinsGroup.pop().destroy();
+      coinCount = coinCount + 1;
+      console.log(coinCount,"hi")
+      coinsGroup.remove(coin)
 
-spawnCoins();
-
-    if (coins.collide(robber)){
-      console.log("collision")
-        coins.destroy();
-        coin = coin + 1;
-  
     }
-
     robber.velocityY = robber.velocityY + 0.8
   
     if (ground.x < 0){
@@ -131,14 +132,14 @@ spawnCoins();
     ground.velocityX = 0;
     robber.velocityY = 0;
     obstaclesGroup.setVelocityXEach(0);
-    coins.setVelocityX(0);
+    coinsGroup.setVelocityXEach(0);
     
     //change the trex animation
     robber.changeAnimation("collided",robber_collided);
     
     //set lifetime of the game objects so that they are never destroyed
     obstaclesGroup.setLifetimeEach(-1);
-    coins.setLifetime(-1);
+    coinsGroup.setLifetimeEach(-1);
     
 
     if(mousePressedOver(restart)) {
@@ -150,22 +151,23 @@ spawnCoins();
 
 function spawnCoins() {
   //write code here to spawn the coins
-  if (frameCount % 60 === 0) {
-    coins = createSprite(600,120,40,10);
-    coins.y = Math.round(random(80,120));
-    coins.addImage(coinsImg);
-    coins.scale = 0.08;
-    coins.velocityX = -3;
+  if (frameCount % 80 === 0) {
+    coin = createSprite(600,120,40,10);
+    coin.y = Math.round(random(80,120));
+    coin.addImage(coinImg);
+    coin.scale = 0.08;
+    coin.velocityX = -3;
     
      //assign lifetime to the variable
-    coins.lifetime = 200;
+    coin.lifetime = 200;
     
     //adjust the depth
-    coins.depth = robber.depth;
+    coin.depth = robber.depth;
     robber.depth = robber.depth + 1;
     
     //add each coin to the group
-    //coinsGroup.add(coins);
+
+  coinsGroup.push(coin);
   
 }
 }
